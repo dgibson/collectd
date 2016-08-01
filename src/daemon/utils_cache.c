@@ -201,6 +201,16 @@ static int uc_insert (const data_set_t *ds, const value_list_t *vl,
 	ce->values_raw[i].absolute = vl->values[i].absolute;
 	break;
 
+      case DS_TYPE_DCOUNTER:
+	ce->values_gauge[i] = NAN;
+	ce->values_raw[i].dcounter = vl->values[i].dcounter;
+	break;
+
+      case DS_TYPE_DDERIVE:
+	ce->values_gauge[i] = NAN;
+	ce->values_raw[i].dderive = vl->values[i].dderive;
+	break;
+
       default:
 	/* This shouldn't happen. */
 	ERROR ("uc_insert: Don't know how to handle data source type %i.",
@@ -446,6 +456,27 @@ int uc_update (const data_set_t *ds, const value_list_t *vl)
 	ce->values_gauge[i] = ((double) vl->values[i].absolute)
 	  / (CDTIME_T_TO_DOUBLE (vl->time - ce->last_time));
 	ce->values_raw[i].absolute = vl->values[i].absolute;
+	break;
+
+#if 0 // FIXME
+      case DS_TYPE_DCOUNTER:
+	{
+	  dcounter_t diff = dcounter_diff (ce->values_raw[i].dcounter, vl->values[i].dcounter);
+	  ce->values_gauge[i] = ((double) diff)
+	    / (CDTIME_T_TO_DOUBLE (vl->time - ce->last_time));
+	  ce->values_raw[i].dcounter = vl->values[i].dcounter;
+	}
+	break;
+#endif
+
+      case DS_TYPE_DDERIVE:
+	{
+	  dderive_t diff = vl->values[i].dderive - ce->values_raw[i].dderive;
+
+	  ce->values_gauge[i] = ((double) diff)
+	    / (CDTIME_T_TO_DOUBLE (vl->time - ce->last_time));
+	  ce->values_raw[i].dderive = vl->values[i].dderive;
+	}
 	break;
 
       default:

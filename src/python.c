@@ -53,7 +53,8 @@ static char get_ds_doc[] = "get_dataset(name) -> definition\n"
 		"    name, type, min and max value.\n"
 		"    'name' is a string.\n"
 		"    'type' is a string that is equal to either DS_TYPE_COUNTER,\n"
-		"        DS_TYPE_GAUGE, DS_TYPE_DERIVE or DS_TYPE_ABSOLUTE.\n"
+		"        DS_TYPE_GAUGE, DS_TYPE_DERIVE, DS_TYPE_ABSOLUTE,\n"
+		"        DS_TYPE_DCOUNTER or DS_TYPE_DDERIVE.\n"
 		"    'min' and 'max' are either a float or None.";
 
 static char flush_doc[] = "flush([plugin][, timeout][, identifier]) -> None\n"
@@ -372,6 +373,10 @@ static int cpy_write_callback(const data_set_t *ds, const value_list_t *value_li
 				PyList_SetItem(list, i, PyLong_FromLongLong(value_list->values[i].derive));
 			} else if (ds->ds[i].type == DS_TYPE_ABSOLUTE) {
 				PyList_SetItem(list, i, PyLong_FromUnsignedLongLong(value_list->values[i].absolute));
+			} else if (ds->ds[i].type == DS_TYPE_DCOUNTER) {
+				PyList_SetItem(list, i, PyFloat_FromDouble(value_list->values[i].dcounter));
+			} else if (ds->ds[i].type == DS_TYPE_DDERIVE) {
+				PyList_SetItem(list, i, PyFloat_FromDouble(value_list->values[i].dderive));
 			} else {
 				Py_BEGIN_ALLOW_THREADS
 				ERROR("cpy_write_callback: Unknown value type %d.", ds->ds[i].type);
@@ -1104,6 +1109,8 @@ static int cpy_init_python(void) {
 	PyModule_AddStringConstant(module, "DS_TYPE_GAUGE", DS_TYPE_TO_STRING(DS_TYPE_GAUGE));
 	PyModule_AddStringConstant(module, "DS_TYPE_DERIVE", DS_TYPE_TO_STRING(DS_TYPE_DERIVE));
 	PyModule_AddStringConstant(module, "DS_TYPE_ABSOLUTE", DS_TYPE_TO_STRING(DS_TYPE_ABSOLUTE));
+	PyModule_AddStringConstant(module, "DS_TYPE_DCOUNTER", DS_TYPE_TO_STRING(DS_TYPE_DCOUNTER));
+	PyModule_AddStringConstant(module, "DS_TYPE_DDERUVE", DS_TYPE_TO_STRING(DS_TYPE_DDERIVE));
 	return 0;
 }
 

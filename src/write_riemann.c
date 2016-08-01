@@ -371,6 +371,17 @@ wrr_value_to_event(struct riemann_host const *host, /* {{{ */
   } else if (rates != NULL) {
     riemann_event_set(event, RIEMANN_EVENT_FIELD_METRIC_D, (double)rates[index],
                       RIEMANN_EVENT_FIELD_NONE);
+  } else if ((ds->ds[index].type == DS_TYPE_DCOUNTER)
+	     || (ds->ds[index].type == DS_TYPE_DDERIVE)) {
+    double metric;
+
+    if (ds->ds[index].type == DS_TYPE_DCOUNTER)
+      metric = vl->values[index].dcounter;
+    else
+      metric = vl->values[index].dderive;
+
+    riemann_event_set(event, RIEMANN_EVENT_FIELD_METRIC_D,
+		      metric, RIEMANN_EVENT_FIELD_NONE);
   } else {
     int64_t metric;
 

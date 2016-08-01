@@ -297,6 +297,28 @@ static int ts_config_set_double (double *ret, oconfig_item_t *ci) /* {{{ */
 	return (0);
 } /* }}} int ts_config_set_double */
 
+static int ts_invoke_dcounter (const data_set_t *ds, value_list_t *vl, /* {{{ */
+		ts_data_t *data, int dsrc_index)
+{
+	if (!isnan (data->factor))
+		vl->values[dsrc_index].dcounter *= data->factor;
+	if (!isnan (data->offset))
+		vl->values[dsrc_index].dcounter += data->offset;
+
+	return (0);
+} /* }}} int ts_invoke_dcounter */
+
+static int ts_invoke_dderive (const data_set_t *ds, value_list_t *vl, /* {{{ */
+		ts_data_t *data, int dsrc_index)
+{
+	if (!isnan (data->factor))
+		vl->values[dsrc_index].dderive *= data->factor;
+	if (!isnan (data->offset))
+		vl->values[dsrc_index].dderive += data->offset;
+
+	return (0);
+} /* }}} int ts_invoke_dderive */
+
 static int ts_config_add_data_source(ts_data_t *data, /* {{{ */
 		oconfig_item_t *ci)
 {
@@ -480,6 +502,10 @@ static int ts_invoke (const data_set_t *ds, value_list_t *vl, /* {{{ */
 			ts_invoke_derive (ds, vl, data, i);
 		else if (ds->ds[i].type == DS_TYPE_ABSOLUTE)
 			ts_invoke_absolute (ds, vl, data, i);
+		else if (ds->ds[i].type == DS_TYPE_DCOUNTER)
+			ts_invoke_dcounter (ds, vl, data, i);
+		else if (ds->ds[i].type == DS_TYPE_DDERIVE)
+			ts_invoke_dderive (ds, vl, data, i);
 		else
 			ERROR ("Target `scale': Ignoring unknown data source type %i",
 					ds->ds[i].type);

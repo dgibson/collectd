@@ -306,6 +306,10 @@ static jobject ctoj_value_to_number (JNIEnv *jvm_env, /* {{{ */
     return (ctoj_jlong_to_number (jvm_env, (jlong) value.derive));
   if (ds_type == DS_TYPE_ABSOLUTE)
     return (ctoj_jlong_to_number (jvm_env, (jlong) value.absolute));
+  else if (ds_type == DS_TYPE_DCOUNTER)
+    return (ctoj_jlong_to_number (jvm_env, (jdouble) value.dcounter));
+  else if (ds_type == DS_TYPE_DDERIVE)
+    return (ctoj_jlong_to_number (jvm_env, (jdouble) value.dderive));
   else
     return (NULL);
 } /* }}} jobject ctoj_value_to_number */
@@ -1065,7 +1069,9 @@ static int jtoc_value (JNIEnv *jvm_env, /* {{{ */
 
   class_ptr = (*jvm_env)->GetObjectClass (jvm_env, object_ptr);
 
-  if (ds_type == DS_TYPE_GAUGE)
+  if ((ds_type == DS_TYPE_GAUGE)
+	|| (ds_type == DS_TYPE_DCOUNTER)
+	|| (ds_type == DS_TYPE_DDERIVE))
   {
     jdouble tmp_double;
 
@@ -1077,7 +1083,12 @@ static int jtoc_value (JNIEnv *jvm_env, /* {{{ */
           "jtoc_double failed.");
       return (-1);
     }
-    (*ret_value).gauge = (gauge_t) tmp_double;
+    if (ds_type == DS_TYPE_GAUGE)
+      (*ret_value).gauge = (gauge_t) tmp_double;
+    else if (ds_type == DS_TYPE_DCOUNTER)
+      (*ret_value).dcounter = (gauge_t) tmp_double;
+    else
+      (*ret_value).dderive = (gauge_t) tmp_double;
   }
   else
   {

@@ -45,11 +45,15 @@
 #define DS_TYPE_GAUGE    1
 #define DS_TYPE_DERIVE   2
 #define DS_TYPE_ABSOLUTE 3
+#define DS_TYPE_DCOUNTER 4
+#define DS_TYPE_DDERIVE  5
 
 #define DS_TYPE_TO_STRING(t) (t == DS_TYPE_COUNTER)     ? "counter"  : \
 				(t == DS_TYPE_GAUGE)    ? "gauge"    : \
 				(t == DS_TYPE_DERIVE)   ? "derive"   : \
 				(t == DS_TYPE_ABSOLUTE) ? "absolute" : \
+				(t == DS_TYPE_DCOUNTER) ? "dcounter" : \
+				(t == DS_TYPE_DDERIVE)  ? "dderive"  : \
 				"unknown"
 
 
@@ -84,6 +88,8 @@ typedef unsigned long long counter_t;
 typedef double gauge_t;
 typedef int64_t derive_t;
 typedef uint64_t absolute_t;
+typedef double dcounter_t;
+typedef double dderive_t;
 
 union value_u
 {
@@ -91,6 +97,8 @@ union value_u
 	gauge_t    gauge;
 	derive_t   derive;
 	absolute_t absolute;
+	dcounter_t dcounter;
+	dderive_t  dderive;
 };
 typedef union value_u value_t;
 

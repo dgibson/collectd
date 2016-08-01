@@ -119,6 +119,26 @@ static int ctail_config_add_match_dstype (ctail_config_match_t *cm,
     else
       cm->flags = 0;
   }
+  else if (strncasecmp ("DCounter", ci->values[0].value.string, strlen ("DCounter")) == 0)
+  {
+    cm->flags = UTILS_MATCH_DS_TYPE_DCOUNTER;
+    if (strcasecmp ("DCounterSet", ci->values[0].value.string) == 0)
+      cm->flags |= UTILS_MATCH_CF_DCOUNTER_SET;
+    else if (strcasecmp ("DCounterAdd", ci->values[0].value.string) == 0)
+      cm->flags |= UTILS_MATCH_CF_DCOUNTER_ADD;
+    else
+      cm->flags = 0;
+  }
+  else if (strncasecmp ("DDerive", ci->values[0].value.string, strlen ("DDerive")) == 0)
+  {
+    cm->flags = UTILS_MATCH_DS_TYPE_DDERIVE;
+    if (strcasecmp ("DDeriveSet", ci->values[0].value.string) == 0)
+      cm->flags |= UTILS_MATCH_CF_DDERIVE_SET;
+    else if (strcasecmp ("DDeriveAdd", ci->values[0].value.string) == 0)
+      cm->flags |= UTILS_MATCH_CF_DDERIVE_ADD;
+    else
+      cm->flags = 0;
+  }
   else
   {
     cm->flags = 0;

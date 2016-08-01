@@ -215,6 +215,54 @@ static int default_callback (const char __attribute__((unused)) *str,
 
     data->values_num++;
   }
+  else if (data->ds_type & UTILS_MATCH_DS_TYPE_DCOUNTER)
+  {
+    dcounter_t value;
+    char *endptr = NULL;
+
+    if (matches_num < 2)
+      return (-1);
+
+    value = (dcounter_t) strtod (matches[1], &endptr);
+    if (matches[1] == endptr)
+      return (-1);
+
+    if (data->ds_type & UTILS_MATCH_CF_DCOUNTER_SET)
+      data->value.dcounter = value;
+    else if (data->ds_type & UTILS_MATCH_CF_DCOUNTER_ADD)
+      data->value.dcounter += value;
+    else
+    {
+      ERROR ("utils_match: default_callback: obj->ds_type is invalid!");
+      return (-1);
+    }
+
+    data->values_num++;
+  }
+  else if (data->ds_type & UTILS_MATCH_DS_TYPE_DDERIVE)
+  {
+    dderive_t value;
+    char *endptr = NULL;
+
+    if (matches_num < 2)
+      return (-1);
+
+    value = (dderive_t) strtod (matches[1], &endptr);
+    if (matches[1] == endptr)
+      return (-1);
+
+    if (data->ds_type & UTILS_MATCH_CF_DDERIVE_SET)
+      data->value.dderive = value;
+    else if (data->ds_type & UTILS_MATCH_CF_DDERIVE_ADD)
+      data->value.dderive += value;
+    else
+    {
+      ERROR ("utils_match: default_callback: obj->ds_type is invalid!");
+      return (-1);
+    }
+
+    data->values_num++;
+  }
   else
   {
     ERROR ("utils_match: default_callback: obj->ds_type is invalid!");

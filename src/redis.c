@@ -357,6 +357,12 @@ static int redis_handle_query (redisContext *rh, redis_node_t *rn, redis_query_t
         case DS_TYPE_ABSOLUTE:
             val.gauge = (absolute_t)rr->integer;
             break;
+        case DS_TYPE_DCOUNTER:
+            val.dcounter = (dcounter_t)rr->integer;
+            break;
+        case DS_TYPE_DDERIVE:
+            val.dderive = (dderive_t)rr->integer;
+            break;
         }
         break;
     case REDIS_REPLY_STRING:

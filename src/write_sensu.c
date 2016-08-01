@@ -452,8 +452,24 @@ static char *sensu_value_to_json(struct sensu_host const *host, /* {{{ */
 				return NULL;
 			}
 		}
-		else {
+		else if (ds->ds[index].type == DS_TYPE_COUNTER) {
 			res = asprintf(&value_str, "%llu", vl->values[index].counter);
+			if (res == -1) {
+				free(ret_str);
+				ERROR("write_sensu plugin: Unable to alloc memory");
+				return NULL;
+			}
+		}
+		else if (ds->ds[index].type == DS_TYPE_DCOUNTER) {
+			res = asprintf(&value_str, DCOUNTER_FORMAT, vl->values[index].dcounter);
+			if (res == -1) {
+				free(ret_str);
+				ERROR("write_sensu plugin: Unable to alloc memory");
+				return NULL;
+			}
+		}
+		else {
+			res = asprintf(&value_str, DDERIVE_FORMAT, vl->values[index].dderive);
 			if (res == -1) {
 				free(ret_str);
 				ERROR("write_sensu plugin: Unable to alloc memory");

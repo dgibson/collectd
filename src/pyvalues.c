@@ -579,6 +579,18 @@ static PyObject *Values_dispatch(Values *self, PyObject *args, PyObject *kwds) {
 				value[i].absolute = PyLong_AsUnsignedLongLong(num);
 				Py_XDECREF(num);
 			}
+		} else if (ds->ds->type == DS_TYPE_DCOUNTER) {
+			num = PyNumber_Float(item); /* New reference. */
+			if (num != NULL) {
+				value[i].dcounter = PyFloat_AsDouble(num);
+				Py_XDECREF(num);
+			}
+		} else if (ds->ds->type == DS_TYPE_DDERIVE) {
+			num = PyNumber_Float(item); /* New reference. */
+			if (num != NULL) {
+				value[i].dderive = PyFloat_AsDouble(num);
+				Py_XDECREF(num);
+			}
 		} else {
 			free(value);
 			PyErr_Format(PyExc_RuntimeError, "unknown data type %d for %s", ds->ds->type, value_list.type);
@@ -681,6 +693,18 @@ static PyObject *Values_write(Values *self, PyObject *args, PyObject *kwds) {
 			num = PyNumber_Long(item); /* New reference. */
 			if (num != NULL) {
 				value[i].absolute = PyLong_AsUnsignedLongLong(num);
+				Py_XDECREF(num);
+			}
+		} else if (ds->ds->type == DS_TYPE_DCOUNTER) {
+			num = PyNumber_Float(item); /* New reference. */
+			if (num != NULL) {
+				value[i].dcounter = PyFloat_AsDouble(num);
+				Py_XDECREF(num);
+			}
+		} else if (ds->ds->type == DS_TYPE_DDERIVE) {
+			num = PyNumber_Float(item); /* New reference. */
+			if (num != NULL) {
+				value[i].dderive = PyFloat_AsDouble(num);
 				Py_XDECREF(num);
 			}
 		} else {

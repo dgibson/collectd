@@ -315,6 +315,10 @@ static int ds_get (char ***ret, /* {{{ */
       type = "DERIVE";
     else if (d->type == DS_TYPE_ABSOLUTE)
       type = "ABSOLUTE";
+    else if (d->type == DS_TYPE_DCOUNTER)
+      type = "DCOUNTER";
+    else if (d->type == DS_TYPE_DDERIVE)
+      type = "DDERIVE";
     else
     {
       ERROR ("rrdtool plugin: Unknown DS type: %i",

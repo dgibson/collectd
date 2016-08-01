@@ -63,7 +63,9 @@ static int value_list_to_string (char *buffer, int buffer_len,
 		if ((ds->ds[i].type != DS_TYPE_COUNTER)
 				&& (ds->ds[i].type != DS_TYPE_GAUGE)
 				&& (ds->ds[i].type != DS_TYPE_DERIVE)
-				&& (ds->ds[i].type != DS_TYPE_ABSOLUTE))
+				&& (ds->ds[i].type != DS_TYPE_ABSOLUTE)
+				&& (ds->ds[i].type != DS_TYPE_DCOUNTER)
+				&& (ds->ds[i].type != DS_TYPE_DDERIVE))
 		{
 			sfree (rates);
 			return (-1);
@@ -108,6 +110,18 @@ static int value_list_to_string (char *buffer, int buffer_len,
 					buffer_len - offset,
 					",%"PRIu64,
 					vl->values[i].absolute);
+		}
+		else if (ds->ds[i].type == DS_TYPE_DCOUNTER)
+		{
+			status = ssnprintf (buffer + offset,
+					buffer_len - offset,
+					",%lf", vl->values[i].dcounter);
+		}
+		else if (ds->ds[i].type == DS_TYPE_DDERIVE)
+		{
+			status = ssnprintf (buffer + offset,
+					buffer_len - offset,
+					",%lf", vl->values[i].dderive);
 		}
 
 		if ((status < 1) || (status >= (buffer_len - offset)))

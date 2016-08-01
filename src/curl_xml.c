@@ -351,6 +351,15 @@ static int cx_handle_single_value_xpath (xmlXPathContextPtr xpath_ctx, /* {{{ */
     case DS_TYPE_GAUGE:
       vl->values[index].gauge = (gauge_t) strtod (node_value,
           /* endptr = */ NULL);
+      break;
+    case DS_TYPE_DCOUNTER:
+      vl->values[index].dcounter = (dcounter_t) strtod (node_value,
+          /* endptr = */ NULL);
+      break;
+    case DS_TYPE_DDERIVE:
+      vl->values[index].dderive = (dderive_t) strtod (node_value,
+          /* endptr = */ NULL);
+      break;
   }
 
   /* free up object */

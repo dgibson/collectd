@@ -139,6 +139,20 @@ static int values_to_json (char *buffer, size_t buffer_size, /* {{{ */
       BUFFER_ADD ("%"PRIi64, vl->values[i].derive);
     else if (ds->ds[i].type == DS_TYPE_ABSOLUTE)
       BUFFER_ADD ("%"PRIu64, vl->values[i].absolute);
+    else if (ds->ds[i].type == DS_TYPE_DCOUNTER)
+    {
+      if(isfinite (vl->values[i].dcounter))
+        BUFFER_ADD (JSON_DCOUNTER_FORMAT, vl->values[i].dcounter);
+      else
+        BUFFER_ADD ("null");
+    }
+    else if (ds->ds[i].type == DS_TYPE_DDERIVE)
+    {
+      if(isfinite (vl->values[i].dderive))
+        BUFFER_ADD (JSON_DDERIVE_FORMAT, vl->values[i].dderive);
+      else
+        BUFFER_ADD ("null");
+    }
     else
     {
       ERROR ("format_json: Unknown data source type: %i",

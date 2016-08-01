@@ -215,6 +215,8 @@ struct {
 	{ "Collectd::DS_TYPE_GAUGE",      DS_TYPE_GAUGE },
 	{ "Collectd::DS_TYPE_DERIVE",     DS_TYPE_DERIVE },
 	{ "Collectd::DS_TYPE_ABSOLUTE",   DS_TYPE_ABSOLUTE },
+	{ "Collectd::DS_TYPE_DCOUNTER",   DS_TYPE_DCOUNTER },
+	{ "Collectd::DS_TYPE_DDERIVE",    DS_TYPE_DDERIVE },
 	{ "Collectd::LOG_ERR",            LOG_ERR },
 	{ "Collectd::LOG_WARNING",        LOG_WARNING },
 	{ "Collectd::LOG_NOTICE",         LOG_NOTICE },
@@ -282,7 +284,9 @@ static int hv2data_source (pTHX_ HV *hash, data_source_t *ds)
 		if ((DS_TYPE_COUNTER != ds->type)
 				&& (DS_TYPE_GAUGE != ds->type)
 				&& (DS_TYPE_DERIVE != ds->type)
-				&& (DS_TYPE_ABSOLUTE != ds->type)) {
+				&& (DS_TYPE_ABSOLUTE != ds->type)
+				&& (DS_TYPE_DCOUNTER != ds->type)
+				&& (DS_TYPE_DDERIVE != ds->type)) {
 			log_err ("hv2data_source: Invalid DS type.");
 			return -1;
 		}
@@ -340,6 +344,10 @@ static size_t av2value (pTHX_ char *name, AV *array, value_t *value, size_t arra
 				value[i].derive = SvIV (*tmp);
 			else if (DS_TYPE_ABSOLUTE == ds->ds[i].type)
 				value[i].absolute = SvIV (*tmp);
+			else if (DS_TYPE_DCOUNTER == ds->ds[i].type)
+				value[i].dcounter = SvNV (*tmp);
+			else if (DS_TYPE_DDERIVE == ds->ds[i].type)
+				value[i].dderive = SvNV (*tmp);
 		}
 		else {
 			return 0;
@@ -661,6 +669,10 @@ static int value_list2hv (pTHX_ value_list_t *vl, data_set_t *ds, HV *hash)
 			val = newSViv (vl->values[i].derive);
 		else if (DS_TYPE_ABSOLUTE == ds->ds[i].type)
 			val = newSViv (vl->values[i].absolute);
+		else if (DS_TYPE_DCOUNTER == ds->ds[i].type)
+			val = newSVnv (vl->values[i].dcounter);
+		else if (DS_TYPE_DDERIVE == ds->ds[i].type)
+			val = newSVnv (vl->values[i].dderive);
 
 		if (NULL == av_store (values, i, val)) {
 			av_undef (values);

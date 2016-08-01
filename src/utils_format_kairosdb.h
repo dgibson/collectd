@@ -34,6 +34,14 @@
 # define JSON_GAUGE_FORMAT GAUGE_FORMAT
 #endif
 
+#ifndef JSON_DCOUNTER_FORMAT
+# define JSON_DCOUNTER_FORMAT DCOUNTER_FORMAT
+#endif
+
+#ifndef JSON_DDERIVE_FORMAT
+# define JSON_DDERIVE_FORMAT DDERIVE_FORMAT
+#endif
+
 int format_kairosdb_initialize (char *buffer,
     size_t *ret_buffer_fill, size_t *ret_buffer_free);
 int format_kairosdb_value_list (char *buffer,

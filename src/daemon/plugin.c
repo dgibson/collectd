@@ -2416,6 +2416,12 @@ int plugin_dispatch_multivalue (value_list_t const *template, /* {{{ */
 		case DS_TYPE_DERIVE:
 			vl->values[0].derive   = va_arg (ap, derive_t);
 			break;
+		case DS_TYPE_DCOUNTER:
+			vl->values[0].dcounter  = va_arg (ap, dcounter_t);
+			break;
+		case DS_TYPE_DDERIVE:
+			vl->values[0].dderive   = va_arg (ap, dderive_t);
+			break;
 		default:
 			ERROR ("plugin_dispatch_multivalue: given store_type is incorrect.");
 			failed++;

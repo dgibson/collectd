@@ -984,6 +984,10 @@ int format_values (char *ret, size_t ret_len, /* {{{ */
                         BUFFER_ADD (":%"PRIi64, vl->values[i].derive);
                 else if (ds->ds[i].type == DS_TYPE_ABSOLUTE)
                         BUFFER_ADD (":%"PRIu64, vl->values[i].absolute);
+                else if (ds->ds[i].type == DS_TYPE_DCOUNTER)
+                        BUFFER_ADD (":"DCOUNTER_FORMAT, vl->values[i].dcounter);
+                else if (ds->ds[i].type == DS_TYPE_DDERIVE)
+                        BUFFER_ADD (":"DDERIVE_FORMAT, vl->values[i].dderive);
                 else
                 {
                         ERROR ("format_values: Unknown data source type: %i",
@@ -1117,6 +1121,14 @@ int parse_value (const char *value_orig, value_t *ret_value, int ds_type)
       ret_value->absolute = (absolute_t) strtoull (value, &endptr, 0);
       break;
 
+    case DS_TYPE_DCOUNTER:
+      ret_value->dcounter = (dcounter_t) strtod (value, &endptr);
+      break;
+
+    case DS_TYPE_DDERIVE:
+      ret_value->dderive = (dderive_t) strtod (value, &endptr);
+      break;
+
     default:
       sfree (value);
       ERROR ("parse_value: Invalid data source type: %i.", ds_type);
@@ -1188,6 +1200,10 @@ int parse_values (char *buffer, value_list_t *vl, const data_set_t *ds)
 
 		if ((strcmp ("U", ptr) == 0) && (ds->ds[i].type == DS_TYPE_GAUGE))
 			vl->values[i].gauge = NAN;
+		else if ((strcmp ("U", ptr) == 0) && (ds->ds[i].type == DS_TYPE_DCOUNTER))
+			vl->values[i].dcounter = NAN;
+		else if ((strcmp ("U", ptr) == 0) && (ds->ds[i].type == DS_TYPE_DDERIVE))
+			vl->values[i].dderive = NAN;
 		else if (0 != parse_value (ptr, &vl->values[i], ds->ds[i].type))
 			return -1;
 
@@ -1389,7 +1405,8 @@ int rate_to_value (value_t *ret_value, gauge_t rate, /* {{{ */
 	 * structure. */
 	if ((rate < 0.0)
 			&& ((ds_type == DS_TYPE_COUNTER)
-				|| (ds_type == DS_TYPE_ABSOLUTE)))
+				|| (ds_type == DS_TYPE_ABSOLUTE)
+				|| (ds_type == DS_TYPE_DCOUNTER)))
 	{
 		memset (state, 0, sizeof (*state));
 		return (EINVAL);
@@ -1423,6 +1440,16 @@ int rate_to_value (value_t *ret_value, gauge_t rate, /* {{{ */
 			state->last_value.absolute = (absolute_t) rate;
 			state->residual = rate - ((gauge_t) state->last_value.absolute);
 		}
+		else if (ds_type == DS_TYPE_DDERIVE)
+		{
+			state->last_value.dderive = (dderive_t) rate;
+			state->residual = rate - ((gauge_t) state->last_value.dderive);
+		}
+		else if (ds_type == DS_TYPE_DCOUNTER)
+		{
+			state->last_value.dcounter = (dcounter_t) rate;
+			state->residual = rate - ((gauge_t) state->last_value.dcounter);
+		}
 		else
 		{
 			assert (23 == 42);
@@ -1452,6 +1479,20 @@ int rate_to_value (value_t *ret_value, gauge_t rate, /* {{{ */
 
 		state->last_value.absolute = delta_absolute;
 		state->residual = delta_gauge - ((gauge_t) delta_absolute);
+	}
+	else if (ds_type == DS_TYPE_DDERIVE)
+	{
+		dderive_t delta_dderive = (dderive_t) delta_gauge;
+
+		state->last_value.dderive += delta_dderive;
+		state->residual = delta_gauge - ((gauge_t) delta_dderive);
+	}
+	else if (ds_type == DS_TYPE_DCOUNTER)
+	{
+		counter_t delta_dcounter = (dcounter_t) delta_gauge;
+
+		state->last_value.dcounter += delta_dcounter;
+		state->residual = delta_gauge - ((gauge_t) delta_dcounter);
 	}
 	else
 	{
@@ -1505,6 +1546,18 @@ int value_to_rate (gauge_t *ret_rate, /* {{{ */
 		*ret_rate = ((gauge_t) diff) / ((gauge_t) interval);
 		break;
 	}
+	case DS_TYPE_DDERIVE: {
+		dderive_t diff = value.dderive - state->last_value.dderive;
+		*ret_rate = ((gauge_t) diff) / ((gauge_t) interval);
+		break;
+	}
+#if 0 // FIXME
+	case DS_TYPE_DCOUNTER: {
+		dcounter_t diff = dcounter_diff (state->last_value.dcounter, value.dcounter);
+		*ret_rate = ((gauge_t) diff) / ((gauge_t) interval);
+		break;
+	}
+#endif
 	default:
 		return EINVAL;
 	}

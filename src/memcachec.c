@@ -178,6 +178,17 @@ static int cmc_config_add_match_dstype (int *dstype_ret, /* {{{ */
     else
       dstype = 0;
   }
+  else if (strncasecmp ("DCounter", ci->values[0].value.string,
+        strlen ("DCounter")) == 0)
+  {
+    dstype = UTILS_MATCH_DS_TYPE_DCOUNTER;
+    if (strcasecmp ("DCounterSet", ci->values[0].value.string) == 0)
+      dstype |= UTILS_MATCH_CF_DCOUNTER_SET;
+    else if (strcasecmp ("DCounterAdd", ci->values[0].value.string) == 0)
+      dstype |= UTILS_MATCH_CF_DCOUNTER_ADD;
+    else
+      dstype = 0;
+  }
   else
   {
     dstype = 0;

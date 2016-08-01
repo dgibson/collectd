@@ -123,6 +123,10 @@ static bson *wm_create_bson (const data_set_t *ds, /* {{{ */
       bson_append_long(ret, key, vl->values[i].derive);
     else if (ds->ds[i].type == DS_TYPE_ABSOLUTE)
       bson_append_long(ret, key, vl->values[i].absolute);
+    else if (ds->ds[i].type == DS_TYPE_DCOUNTER)
+      bson_append_double(ret, key, vl->values[i].dcounter);
+    else if (ds->ds[i].type == DS_TYPE_DDERIVE)
+      bson_append_double(ret, key, vl->values[i].dderive);
     else
       assert (23 == 42);
   }

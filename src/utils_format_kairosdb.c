@@ -200,6 +200,46 @@ static int values_to_kairosdb (char *buffer, size_t buffer_size, /* {{{ */
     BUFFER_ADD (",");
     BUFFER_ADD ("%"PRIu64, vl->values[ds_idx].absolute);
   }
+  else if (ds->ds[ds_idx].type == DS_TYPE_DCOUNTER)
+  {
+    if (isfinite (vl->values[ds_idx].dcounter))
+    {
+      BUFFER_ADD ("[[");
+      BUFFER_ADD ("%"PRIu64, CDTIME_T_TO_MS (vl->time));
+      BUFFER_ADD (",");
+      BUFFER_ADD (JSON_DCOUNTER_FORMAT, vl->values[ds_idx].dcounter);
+    }
+    else
+    {
+      DEBUG ("utils_format_kairosdb: invalid vl->values[ds_idx].dcounter for %s|%s|%s|%s|%s",
+                vl->plugin,
+                vl->plugin_instance,
+                vl->type,
+                vl->type_instance,
+                ds->ds[ds_idx].name);
+      return (-1);
+    }
+  }
+  else if (ds->ds[ds_idx].type == DS_TYPE_DDERIVE)
+  {
+    if (isfinite (vl->values[ds_idx].dderive))
+    {
+      BUFFER_ADD ("[[");
+      BUFFER_ADD ("%"PRIu64, CDTIME_T_TO_MS (vl->time));
+      BUFFER_ADD (",");
+      BUFFER_ADD (JSON_DDERIVE_FORMAT, vl->values[ds_idx].dderive);
+    }
+    else
+    {
+      DEBUG ("utils_format_kairosdb: invalid vl->values[ds_idx].dderive for %s|%s|%s|%s|%s",
+                vl->plugin,
+                vl->plugin_instance,
+                vl->type,
+                vl->type_instance,
+                ds->ds[ds_idx].name);
+      return (-1);
+    }
+  }
   else
   {
     ERROR ("format_kairosdb: Unknown data source type: %i",

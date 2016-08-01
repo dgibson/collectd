@@ -63,6 +63,8 @@ DS_TYPE_COUNTER      = 0
 DS_TYPE_GAUGE        = 1
 DS_TYPE_DERIVE       = 2
 DS_TYPE_ABSOLUTE     = 3
+DS_TYPE_DCOUNTER     = 4
+DS_TYPE_DDERIVE      = 5
 
 header = struct.Struct("!2H")
 number = struct.Struct("!Q")
@@ -92,6 +94,12 @@ def decode_network_values(ptype, plen, buf):
             result.append((dstype, number.unpack_from(buf, off)[0]))
             off += valskip
         elif dstype == DS_TYPE_ABSOLUTE:
+            result.append((dstype, number.unpack_from(buf, off)[0]))
+            off += valskip
+        elif dstype == DS_TYPE_DCOUNTER:
+            result.append((dstype, number.unpack_from(buf, off)[0]))
+            off += valskip
+        elif dstype == DS_TYPE_DDERIVE:
             result.append((dstype, number.unpack_from(buf, off)[0]))
             off += valskip
         else:
